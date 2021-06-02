@@ -152,4 +152,4 @@ media/
 api/migrations/*
 
 # тестовые csv
-/data/*
+data/*
