@@ -5,6 +5,10 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 
+class Title(models.Model):
+    pass
+
+
 class Review(models.Model):
     # id
     # title_id объект для оценки
