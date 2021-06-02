@@ -1,10 +1,44 @@
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
-from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
 
 
-User = get_user_model()
+class User(AbstractUser):
+    USER = 'user'
+    MODER = 'moderator'
+    ADMIN = 'admin'
+    ROLES = [
+        (USER, 'Пользователь'),
+        (MODER, 'Модератор'),
+        (ADMIN, 'Администратор'),
+    ]
+    role = models.TextField(
+        blank=True,
+        choices=ROLES,
+    )
+    description = models.CharField(
+        blank=True,
+        max_length=100
+    )
+
+    @property
+    def is_admin(self):
+        return bool(
+            self.role == self.ADMIN
+            or self.is_superuser
+        )
+
+    @property
+    def is_moderator(self):
+        return self.role == self.MODER
+
+
+class Title(models.Model):
+    """
+        ТЕСТОВАЯ МОДЕЛЬ
+        Заменить на боевую
+    """
+    name = models.TextField()
 
 
 class Review(models.Model):
@@ -71,42 +105,3 @@ class Comment(models.Model):
     class Meta:
         verbose_name = "Комментарий"
         verbose_name_plural = "Комментарии"
-
-
-class User(AbstractUser):
-    USER = 'user'
-    MODER = 'moderator'
-    ADMIN = 'admin'
-    ROLES = [
-        (USER, 'Пользователь'),
-        (MODER, 'Модератор'),
-        (ADMIN, 'Администратор'),
-    ]
-    role = models.TextField(
-        blank=True,
-        choices=ROLES,
-    )
-    description = models.CharField(
-        blank=True,
-        max_length=100
-    )
-
-    @property
-    def is_admin(self):
-        return bool(
-            self.role == self.ADMIN
-            or self.is_superuser
-        )
-
-    @property
-    def is_moderator(self):
-        return self.role == self.MODER
-
-
-class Title(models.Model):
-    """
-        ТЕСТОВАЯ МОДЕЛЬ
-        Заменить на боевую
-    """
-    name = models.TextField()
-
