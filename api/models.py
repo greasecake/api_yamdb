@@ -6,7 +6,7 @@ User = get_user_model()
 
 
 class Review(models.Model):
-    # review_id
+    # id
     # title_id объект для оценки
     title = models.ForeignKey(
         Title,
@@ -38,3 +38,34 @@ class Review(models.Model):
     class Meta:
         verbose_name = "Отзыв"
         verbose_name_plural = "Отзывы"
+
+
+class Comment(models.Model):
+    # id (comment_id) integer (ID комментария)
+    # review_id  ID отзыва
+    review = models.ForeignKey(
+        Review,
+        on_delete=models.CASCADE,
+        related_name='comments',
+    )
+    # string (Текст комментария)
+    text = models.CharField(
+        "Текст комментария",
+        max_length=1500,
+        help_text='Максимальная длина 1500 символов'
+    )
+    # string (username автора комментария)
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='comments'
+    )
+    # string <date-time> (Дата публикации комментария)
+    pub_date = models.DateTimeField("Дата публикации", auto_now_add=True)
+
+    def __str__(self):
+        return self.text
+
+    class Meta:
+        verbose_name = "Комментарий"
+        verbose_name_plural = "Комментарии"
