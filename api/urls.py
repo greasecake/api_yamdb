@@ -1,22 +1,21 @@
-from django.urls import path, include
+from django.urls import include, path
 from rest_framework.routers import DefaultRouter
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-)
+from rest_framework_simplejwt.views import (TokenObtainPairView,
+                                            TokenRefreshView)
 
-from .views import ReviewViewSet, CommentViewSet
+from .views import CommentViewSet, ReviewViewSet
 
 router = DefaultRouter()
 # (GET, POST) /titles/{title_id}/reviews/
 # (GET, PATCH, DELETE) /titles/{title_id}/reviews/{review_id}/
 router.register(
-    'titles/(?P<title_id>\d+)/reviews',
+    r'titles/(?P<title_id>\d+)/reviews',
     ReviewViewSet,
     basename='reviews'
 )
 # (GET, POST) /titles/{title_id}/reviews/{review_id}/comments/
-# (GET, PATCH, DELETE) /titles/{title_id}/reviews/{review_id}/comments/{comment_id}/
+# (GET, PATCH, DELETE)
+#               /titles/{title_id}/reviews/{review_id}/comments/{comment_id}/
 router.register(
     r'titles/(?P<title_id>\d+)/reviews/(?P<review_id>\d+)/comments',
     CommentViewSet,

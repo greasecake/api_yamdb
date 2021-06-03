@@ -1,15 +1,11 @@
-from rest_framework import filters, viewsets
+from rest_framework import viewsets
 from rest_framework.generics import get_object_or_404
-from rest_framework.pagination import PageNumberPagination
 
-from .models import Review, Comment, Title, User
+from .models import Review, Title
 from .paginations import StandardResultsSetPagination
-from .serializers import ReviewSerializer, CommentSerializer
-from .permissions import (
-    AuthorPermisssion,
-    AdminPermission,
-    ModeratorPermission
-)
+from .permissions import (AdminPermission, AuthorPermisssion,
+                          ModeratorPermission)
+from .serializers import CommentSerializer, ReviewSerializer
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
