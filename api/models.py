@@ -42,6 +42,9 @@ class User(AbstractUser):
     def is_moderator(self):
         return self.role == self.MODER
 
+    def __str__(self):
+        return self.username
+
 
 class Title(models.Model):
     """
