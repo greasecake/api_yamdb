@@ -46,11 +46,18 @@ class Review(models.Model):
     Ресурс REVIEWS: отзывы на произведения.
     Отзыв привязан к определённому произведению.
 
-    title -> Title : Объект для оценки
-    text -> string : Текст отзыва
-    author -> User : Пользователя
-    score -> Int : Оценка от 1 до 10
-    pub_date -> DateTime : Дата публикации отзыва
+    Parameters
+    ----------
+    title : Title
+        Объект для оценки
+    text : string
+        Текст отзыва
+    author : User
+        Пользователя
+    score : Int
+        Оценка от 1 до 10
+    pub_date : DateTime
+        Дата публикации отзыва
     """
     title = models.ForeignKey(
         Title,
@@ -89,10 +96,16 @@ class Comment(models.Model):
     Ресурс COMMENTS: комментарии к отзывам.
     Комментарий привязан к определённому отзыву.
 
-    review -> Review : Объект отзыва
-    text -> string : Текст комментария
-    author -> User : Автор комментария
-    pub_date -> DateTime : Дата публикации комментария
+    Parameters
+    ----------
+    review : Review
+        Объект отзыва
+    text : string
+        Текст комментария
+    author : User
+        Автор комментария
+    pub_date : DateTime
+        Дата публикации комментария
     """
     review = models.ForeignKey(
         Review,
