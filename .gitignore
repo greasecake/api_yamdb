@@ -153,3 +153,6 @@ api/migrations/*
 
 # тестовые csv
 data/*
+
+# отправленные email
+sent_emails/*

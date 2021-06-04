@@ -1,5 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+# from rest_framework.authtoken.models import Token
+
+
+class Confirmation(models.Model):
+    key = models.CharField(max_length=20)
+    email = models.EmailField()
 
 
 class User(AbstractUser):
@@ -15,10 +21,15 @@ class User(AbstractUser):
         blank=True,
         choices=ROLES,
     )
+    bio = models.CharField(
+        blank=True,
+        max_length=100
+    )
     description = models.CharField(
         blank=True,
         max_length=100
     )
+    email = models.EmailField(unique=True)
 
     @property
     def is_admin(self):
