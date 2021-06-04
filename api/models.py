@@ -1,6 +1,6 @@
-from django.db import models
 from django.contrib.auth.models import AbstractUser
-# from rest_framework.authtoken.models import Token
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
 
 
 class Confirmation(models.Model):
@@ -53,10 +53,75 @@ class Title(models.Model):
 
 class Review(models.Model):
     """
-        ТЕСТОВАЯ МОДЕЛЬ
-        Заменить на боевую
+    Ресурс REVIEWS: отзывы на произведения.
+    Отзыв привязан к определённому произведению.
+
+    title -> Title : Объект для оценки
+    text -> string : Текст отзыва
+    author -> User : Пользователя
+    score -> Int : Оценка от 1 до 10
+    pub_date -> DateTime : Дата публикации отзыва
     """
-    text = models.TextField()
-    author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='reviews'
+    title = models.ForeignKey(
+        Title,
+        on_delete=models.CASCADE,
+        related_name='reviews'
     )
+    text = models.CharField(
+        "Текст отзыва",
+        max_length=1500,
+        help_text='Максимальная длина 1500 символов'
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='reviews',
+        db_column='author',
+    )
+    score = models.IntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(10)]
+    )
+    pub_date = models.DateTimeField("Дата публикации", auto_now_add=True)
+
+    def __str__(self):
+        return self.text
+
+    class Meta:
+        verbose_name = "Отзыв"
+        verbose_name_plural = "Отзывы"
+
+
+class Comment(models.Model):
+    """
+    Ресурс COMMENTS: комментарии к отзывам.
+    Комментарий привязан к определённому отзыву.
+
+    review -> Review : Объект отзыва
+    text -> string : Текст комментария
+    author -> User : Автор комментария
+    pub_date -> DateTime : Дата публикации комментария
+    """
+    review = models.ForeignKey(
+        Review,
+        on_delete=models.CASCADE,
+        related_name='comments',
+    )
+    text = models.CharField(
+        "Текст комментария",
+        max_length=1500,
+        help_text='Максимальная длина 1500 символов'
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='comments',
+        db_column='author',
+    )
+    pub_date = models.DateTimeField("Дата публикации", auto_now_add=True)
+
+    def __str__(self):
+        return self.text
+
+    class Meta:
+        verbose_name = "Комментарий"
+        verbose_name_plural = "Комментарии"

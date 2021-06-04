@@ -1,34 +1,24 @@
 from .models import Review
-from rest_framework.serializers import (
-    ModelSerializer,
-    SlugRelatedField,
-    Serializer,
-    EmailField,
-    CharField
-)
+from .models import Comment, Review
+
 from django.contrib.auth import get_user_model
+from rest_framework import serializers
 
 
 User = get_user_model()
 
 
-class ReviewSerializer(ModelSerializer):
-    """
-        ТЕСТОВЫЙ СЕРИАЛИЗАТОР
-        Заменить на боевой
-    """
-    author = SlugRelatedField(
-        read_only=True,
-        slug_field='username'
+class ReviewSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        read_only=True, slug_field='username'
     )
 
     class Meta:
-        fields = '__all__'
-        read_only_fields = ['author']
+        fields = ('id', 'text', 'author', 'score', 'pub_date')
         model = Review
 
 
-class UserSerializer(ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
         fields = [
             'username',
@@ -41,10 +31,20 @@ class UserSerializer(ModelSerializer):
         model = User
 
 
-class TokenSerializer(Serializer):
-    email = EmailField()
-    confirmation = CharField(max_length=20)
+class TokenSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    confirmation = serializers.CharField(max_length=20)
 
 
-class ConfirmationSerializer(Serializer):
-    email = EmailField()
+class ConfirmationSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        read_only=True, slug_field='username'
+    )
+
+    class Meta:
+        fields = ('id', 'text', 'author', 'pub_date')
+        model = Comment
