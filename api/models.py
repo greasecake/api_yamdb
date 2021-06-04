@@ -56,16 +56,24 @@ class Review(models.Model):
     Ресурс REVIEWS: отзывы на произведения.
     Отзыв привязан к определённому произведению.
 
-    title -> Title : Объект для оценки
-    text -> string : Текст отзыва
-    author -> User : Пользователя
-    score -> Int : Оценка от 1 до 10
-    pub_date -> DateTime : Дата публикации отзыва
+    Parameters
+    ----------
+    title : Title
+        Объект для оценки
+    text : string
+        Текст отзыва
+    author : User
+        Пользователя
+    score : Int
+        Оценка от 1 до 10
+    pub_date : DateTime
+        Дата публикации отзыва
     """
     title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
-        related_name='reviews'
+        related_name='reviews',
+        verbose_name='Произведение',
     )
     text = models.CharField(
         "Текст отзыва",
@@ -77,14 +85,16 @@ class Review(models.Model):
         on_delete=models.CASCADE,
         related_name='reviews',
         db_column='author',
+        verbose_name='Автор',
     )
     score = models.IntegerField(
+        "Оценка",
         validators=[MinValueValidator(1), MaxValueValidator(10)]
     )
     pub_date = models.DateTimeField("Дата публикации", auto_now_add=True)
 
     def __str__(self):
-        return self.text
+        return self.text[:40] + '...'
 
     class Meta:
         verbose_name = "Отзыв"
@@ -96,15 +106,22 @@ class Comment(models.Model):
     Ресурс COMMENTS: комментарии к отзывам.
     Комментарий привязан к определённому отзыву.
 
-    review -> Review : Объект отзыва
-    text -> string : Текст комментария
-    author -> User : Автор комментария
-    pub_date -> DateTime : Дата публикации комментария
+    Parameters
+    ----------
+    review : Review
+        Объект отзыва
+    text : string
+        Текст комментария
+    author : User
+        Автор комментария
+    pub_date : DateTime
+        Дата публикации комментария
     """
     review = models.ForeignKey(
         Review,
         on_delete=models.CASCADE,
         related_name='comments',
+        verbose_name='Отзыв',
     )
     text = models.CharField(
         "Текст комментария",
@@ -116,11 +133,12 @@ class Comment(models.Model):
         on_delete=models.CASCADE,
         related_name='comments',
         db_column='author',
+        verbose_name='Автор',
     )
     pub_date = models.DateTimeField("Дата публикации", auto_now_add=True)
 
     def __str__(self):
-        return self.text
+        return self.text[:40] + '...'
 
     class Meta:
         verbose_name = "Комментарий"
