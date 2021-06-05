@@ -94,13 +94,6 @@ class Title(models.Model):
 
 
 class Review(models.Model):
-    title_id = models.ForeignKey(
-        Title,
-        on_delete=models.CASCADE,
-    )
-
-
-class Review(models.Model):
     """
     Ресурс REVIEWS: отзывы на произведения.
     Отзыв привязан к определённому произведению.

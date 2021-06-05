@@ -93,21 +93,25 @@ class TitleSerializer(serializers.ModelSerializer):
         instance.genre.set(genre)
         return instance
 
-    def update(self, instance, validated_data):
+    def partial_update(self, instance, validated_data):
         instance.name = validated_data.get('name', instance.name)
         instance.year = validated_data.get('year', instance.year)
         instance.description = validated_data.get(
             'description', instance.description
         )
-        instance.category = validated_data.get('category', instance.category)
-        instance.genre.set(validated_data.get('genre', instance.genre))
+        if not validated_data.get('genre', None) is None:
+            instance.category = Category.objects.get(
+                slug=validated_data.get('category')
+            )
+        if not validated_data.get('genre', None) is None:
+            instance.genre.set(validated_data.get('genre'))
         return instance
 
     def get_rating(self, obj):
         rating = Review.objects.filter(title_id=obj.id).aggregate(
             Avg('score')).get('score__avg')
         if rating is None:
-            return 'None'
+            return None
         return round(rating, 1)
 
     def to_representation(self, instance):
