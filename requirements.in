@@ -2,3 +2,7 @@ pytest-django
 requests
 django
 djangorestframework
+djangorestframework-simplejwt
+django-filter
+flake8
+importlib-metadata==1.6.0
