@@ -100,7 +100,6 @@ class Review(models.Model):
     )
 
 
-
 class Review(models.Model):
     """
     Ресурс REVIEWS: отзывы на произведения.
