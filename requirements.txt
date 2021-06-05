@@ -12,9 +12,12 @@ certifi==2020.4.5.1
     # via requests
 chardet==3.0.4
     # via requests
+django-filter==2.4.0
+    # via -r requirements.in
 django==3.0.5
     # via
     #   -r requirements.in
+    #   django-filter
     #   djangorestframework
     #   djangorestframework-simplejwt
 djangorestframework-simplejwt==4.7.1
