@@ -152,7 +152,7 @@ dmypy.json
 media/
 
 # миграции
-api/migrations/*
+# api/migrations/*
 
 # тестовые csv
 data/*
