@@ -1,6 +1,8 @@
 import binascii
 import os
 
+from django_filters.rest_framework.backends import DjangoFilterBackend
+
 from .models import (
     Review,
     Confirmation,
@@ -20,8 +22,9 @@ from .permissions import (
     ModeratorPermission
 )
 from .paginations import StandardResultsSetPagination
+from .filters import TitleFilterSet
 
-from rest_framework import viewsets, filters, status, response
+from rest_framework import viewsets, filters, status
 from rest_framework.decorators import api_view
 from rest_framework.generics import RetrieveUpdateAPIView, get_object_or_404
 from rest_framework.permissions import IsAuthenticated
@@ -30,7 +33,6 @@ from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
 from rest_framework_simplejwt.tokens import RefreshToken
-from django_filters.rest_framework import DjangoFilterBackend
 
 
 from .serializers import (
@@ -148,17 +150,23 @@ class CategoryViewSet(viewsets.ModelViewSet):
     pagination_class = PageNumberPagination
     permission_classes = (AdminOrReadOnly,)
 
+    def retrieve(self, request, *args, **kwargs):
+        try:
+            super().retrieve(self, request, *args, **kwargs)
+        except Exception:
+            return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
     def destroy(self, request, pk=None):
         category = get_object_or_404(Category, slug=pk)
         self.perform_destroy(category)
-        return response.Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class TitleViewSet(viewsets.ModelViewSet):
     serializer_class = TitleSerializer
     queryset = Title.objects.all()
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('name', 'year', 'genre__slug', 'category__slug',)
+    filterset_class = TitleFilterSet
     http_method_names = ['get', 'post', 'patch', 'delete']
     pagination_class = PageNumberPagination
     permission_classes = (AdminOrReadOnly,)
@@ -173,7 +181,13 @@ class GenreViewSet(viewsets.ModelViewSet):
     pagination_class = PageNumberPagination
     permission_classes = (AdminOrReadOnly,)
 
+    def retrieve(self, request, *args, **kwargs):
+        try:
+            super().retrieve(self, request, *args, **kwargs)
+        except Exception:
+            return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
     def destroy(self, request, pk=None):
         genre = get_object_or_404(Genre, slug=pk)
         self.perform_destroy(genre)
-        return response.Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_204_NO_CONTENT)
