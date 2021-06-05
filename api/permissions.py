@@ -43,6 +43,29 @@ class AdminPermission(BasePermission):
         )
 
 
+class AdminOrReadOnly(BasePermission):
+    """
+        С этим разрешением:
+        - пользователи могут читать
+        - админы могут создавать, редактировать и удалять
+    """
+    def has_permission(self, request, view):
+        return bool(
+            request.method in SAFE_METHODS
+            or request.user
+            and request.user.is_authenticated
+            and request.user.is_admin
+        )
+
+    def has_object_permission(self, request, view, obj):
+        return bool(
+            request.method in SAFE_METHODS
+            or request.user
+            and request.user.is_authenticated
+            and request.user.is_admin
+        )
+
+
 class ModeratorPermission(BasePermission):
     """
         С этим разрешением:
