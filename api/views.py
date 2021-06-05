@@ -16,6 +16,7 @@ from .serializers import (
 from .permissions import (
     AuthorPermisssion,
     AdminPermission,
+    AdminOrReadOnly,
     ModeratorPermission
 )
 from .paginations import StandardResultsSetPagination
@@ -23,7 +24,7 @@ from .paginations import StandardResultsSetPagination
 from rest_framework import viewsets, filters, status, response
 from rest_framework.decorators import api_view
 from rest_framework.generics import RetrieveUpdateAPIView, get_object_or_404
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
@@ -145,7 +146,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     search_fields = ('name',)
     http_method_names = ['get', 'post', 'delete']
     pagination_class = PageNumberPagination
-    # permission_classes
+    permission_classes = (AdminOrReadOnly,)
 
     def destroy(self, request, pk=None):
         category = get_object_or_404(Category, slug=pk)
@@ -160,6 +161,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     filterset_fields = ('name', 'year', 'genre__slug', 'category__slug',)
     http_method_names = ['get', 'post', 'patch', 'delete']
     pagination_class = PageNumberPagination
+    permission_classes = (AdminOrReadOnly,)
 
 
 class GenreViewSet(viewsets.ModelViewSet):
@@ -169,7 +171,7 @@ class GenreViewSet(viewsets.ModelViewSet):
     search_fields = ('name',)
     http_method_names = ['get', 'post', 'delete']
     pagination_class = PageNumberPagination
-    # permission_classes
+    permission_classes = (AdminOrReadOnly,)
 
     def destroy(self, request, pk=None):
         genre = get_object_or_404(Genre, slug=pk)
