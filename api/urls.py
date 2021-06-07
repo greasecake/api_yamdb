@@ -1,7 +1,11 @@
 from .views import (
-    TitleViewSet, CategoryViewSet, GenreViewSet,
-    UserMeView, UserViewSet,
-    CommentViewSet, ReviewViewSet,
+    TitleViewSet,
+    CategoryViewSet,
+    GenreViewSet,
+    # UserMeView,
+    UserViewSet,
+    CommentViewSet,
+    ReviewViewSet,
     get_token,
     get_confirmation,
 )
@@ -37,7 +41,6 @@ router.register(r'^genres', GenreViewSet)
 router.register(r'^titles', TitleViewSet)
 
 urlpatterns = [
-    path(r'v1/users/me/', UserMeView.as_view(), name='me'),
     path('v1/', include(router.urls)),
 ]
 
