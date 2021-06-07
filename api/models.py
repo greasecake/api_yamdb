@@ -4,7 +4,7 @@ from django.db import models
 
 
 class Confirmation(models.Model):
-    key = models.CharField(max_length=20)
+    key = models.CharField(max_length=50)
     email = models.EmailField()
 
 
