@@ -26,9 +26,9 @@ from .paginations import StandardResultsSetPagination
 from .filters import TitleFilterSet
 
 from rest_framework import viewsets, filters, status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, action
 from rest_framework.exceptions import ValidationError
-from rest_framework.generics import RetrieveUpdateAPIView, get_object_or_404
+from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
@@ -97,16 +97,23 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = (AdminPermission,)
     lookup_field = 'username'
 
-
-class UserMeView(RetrieveUpdateAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = (IsAuthenticated,)
-
-    def get_object(self):
-        user = self.request.user
-        obj = get_object_or_404(User, username=user)
-        return obj
+    @action(
+        detail=False,
+        methods=['PATCH', 'GET'],
+        permission_classes=(IsAuthenticated,)
+    )
+    def me(self, request):
+        user = get_object_or_404(self.get_queryset(), username=request.user)
+        serializer = self.get_serializer(user)
+        if request.method == 'PATCH':
+            serializer = self.get_serializer(
+                user,
+                data=request.data,
+                partial=True
+            )
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+        return Response(serializer.data)
 
 
 @api_view(['POST'])
