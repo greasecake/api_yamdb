@@ -8,12 +8,18 @@ from .models import (
     Confirmation,
     Review,
     Title,
+    Category,
+    Genre
 )
 from .serializers import (
     ReviewSerializer,
     CommentSerializer,
     UserSerializer,
     TokenSerializer,
+    WriteTitleSerializer,
+    ReadTitleSerializer,
+    CategorySerializer,
+    GenreSerializer
 )
 from .permissions import (
     AuthorPermisssion,
@@ -33,13 +39,8 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
+from django.db.models import Avg
 from rest_framework_simplejwt.tokens import RefreshToken
-
-
-from .serializers import (
-    TitleSerializer, CategorySerializer, GenreSerializer
-)
-from .models import Title, Category, Genre
 
 
 User = get_user_model()
@@ -170,13 +171,17 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    serializer_class = TitleSerializer
-    queryset = Title.objects.all()
+    queryset = Title.objects.annotate(rating=Avg('reviews__score'))
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilterSet
     http_method_names = ['get', 'post', 'patch', 'delete']
     pagination_class = PageNumberPagination
     permission_classes = (AdminOrReadOnly,)
+
+    def get_serializer_class(self):
+        if self.action in ['create', 'partial_update']:
+            return WriteTitleSerializer
+        return ReadTitleSerializer
 
 
 class GenreViewSet(viewsets.ModelViewSet):
