@@ -14,6 +14,7 @@ from .serializers import (
     CommentSerializer,
     UserSerializer,
     TokenSerializer,
+    ConfirmationSerializer,
 )
 from .permissions import (
     AuthorPermisssion,
@@ -33,6 +34,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
+from django.conf import settings
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
@@ -127,7 +129,7 @@ def get_token(request):
 
 @api_view(['POST'])
 def get_confirmation(request):
-    serializer = TokenSerializer(request.data)
+    serializer = ConfirmationSerializer(request.data)
     key = binascii.hexlify(os.urandom(20)).decode()
     email = serializer.data['email']
     Confirmation.objects.update_or_create(
@@ -140,12 +142,13 @@ def get_confirmation(request):
     send_mail(
         subject='Confirmation',
         message=key,
-        from_email='admin@yamdb.fake',
+        from_email=settings.ADMIN_EMAIL,
         recipient_list=[email]
     )
-    return Response({
-        'confirmation': key
-    })
+    return Response(
+        f'Код подтверждения отправлен на адрес {email}',
+        status=status.HTTP_200_OK
+    )
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
