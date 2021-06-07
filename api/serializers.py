@@ -30,7 +30,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class TokenSerializer(serializers.Serializer):
     email = serializers.EmailField()
-    confirmation = serializers.CharField(max_length=20)
+    confirmation = serializers.CharField(max_length=50)
 
 
 class ConfirmationSerializer(serializers.Serializer):

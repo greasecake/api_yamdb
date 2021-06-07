@@ -111,27 +111,33 @@ class UserMeView(RetrieveUpdateAPIView):
 
 @api_view(['POST'])
 def get_token(request):
-    serializer = TokenSerializer(request.data)
-    email = serializer.data['email']
-    confirmation = serializer.data['confirmation']
-    key = get_object_or_404(Confirmation, email=email).key
-    if confirmation == key:
-        user = User.objects.create(
-            username=email,
+    serializer = TokenSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    email = serializer.validated_data['email']
+    recieved_key = serializer.validated_data['confirmation']
+    confirmation = get_object_or_404(Confirmation, email=email)
+    stored_key = confirmation.key
+    if recieved_key == stored_key:
+        user, created = User.objects.get_or_create(
             email=email,
-            role='user'
+            defaults={
+                'username': email,
+                'email': email,
+                'role': 'user'
+            }
         )
-        user.save()
         token = RefreshToken.for_user(user)
+        confirmation.delete()
         return Response({'token': str(token.access_token)})
     return Response('Something is wrong')
 
 
 @api_view(['POST'])
 def get_confirmation(request):
-    serializer = ConfirmationSerializer(request.data)
+    serializer = ConfirmationSerializer(data=request.data)
     key = binascii.hexlify(os.urandom(20)).decode()
-    email = serializer.data['email']
+    serializer.is_valid(raise_exception=True)
+    email = serializer.validated_data['email']
     Confirmation.objects.update_or_create(
         email=email,
         defaults={
