@@ -6,7 +6,7 @@ from .validators import year_validator
 
 
 class Confirmation(models.Model):
-    key = models.CharField(max_length=20)
+    key = models.CharField(max_length=50)
     email = models.EmailField()
 
 

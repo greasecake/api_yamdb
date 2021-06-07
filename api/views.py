@@ -19,7 +19,8 @@ from .serializers import (
     WriteTitleSerializer,
     ReadTitleSerializer,
     CategorySerializer,
-    GenreSerializer
+    GenreSerializer,
+    ConfirmationSerializer,
 )
 from .permissions import (
     AuthorPermisssion,
@@ -31,15 +32,16 @@ from .paginations import StandardResultsSetPagination
 from .filters import TitleFilterSet
 
 from rest_framework import viewsets, filters, status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, action
 from rest_framework.exceptions import ValidationError
-from rest_framework.generics import RetrieveUpdateAPIView, get_object_or_404
+from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
 from django.db.models import Avg
+from django.conf import settings
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
@@ -96,41 +98,54 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = (AdminPermission,)
     lookup_field = 'username'
 
-
-class UserMeView(RetrieveUpdateAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = (IsAuthenticated,)
-
-    def get_object(self):
-        user = self.request.user
-        obj = get_object_or_404(User, username=user)
-        return obj
+    @action(
+        detail=False,
+        methods=['PATCH', 'GET'],
+        permission_classes=(IsAuthenticated,)
+    )
+    def me(self, request):
+        user = get_object_or_404(self.get_queryset(), username=request.user)
+        serializer = self.get_serializer(user)
+        if request.method == 'PATCH':
+            serializer = self.get_serializer(
+                user,
+                data=request.data,
+                partial=True
+            )
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+        return Response(serializer.data)
 
 
 @api_view(['POST'])
 def get_token(request):
-    serializer = TokenSerializer(request.data)
-    email = serializer.data['email']
-    confirmation = serializer.data['confirmation']
-    key = get_object_or_404(Confirmation, email=email).key
-    if confirmation == key:
-        user = User.objects.create(
-            username=email,
+    serializer = TokenSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    email = serializer.validated_data['email']
+    recieved_key = serializer.validated_data['confirmation']
+    confirmation = get_object_or_404(Confirmation, email=email)
+    stored_key = confirmation.key
+    if recieved_key == stored_key:
+        user, created = User.objects.get_or_create(
             email=email,
-            role='user'
+            defaults={
+                'username': email,
+                'email': email,
+                'role': 'user'
+            }
         )
-        user.save()
         token = RefreshToken.for_user(user)
+        confirmation.delete()
         return Response({'token': str(token.access_token)})
     return Response('Something is wrong')
 
 
 @api_view(['POST'])
 def get_confirmation(request):
-    serializer = TokenSerializer(request.data)
+    serializer = ConfirmationSerializer(data=request.data)
     key = binascii.hexlify(os.urandom(20)).decode()
-    email = serializer.data['email']
+    serializer.is_valid(raise_exception=True)
+    email = serializer.validated_data['email']
     Confirmation.objects.update_or_create(
         email=email,
         defaults={
@@ -141,12 +156,13 @@ def get_confirmation(request):
     send_mail(
         subject='Confirmation',
         message=key,
-        from_email='admin@yamdb.fake',
+        from_email=settings.ADMIN_EMAIL,
         recipient_list=[email]
     )
-    return Response({
-        'confirmation': key
-    })
+    return Response(
+        f'Код подтверждения отправлен на адрес {email}',
+        status=status.HTTP_200_OK
+    )
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
