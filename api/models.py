@@ -2,6 +2,8 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
+from .validators import year_validator
+
 
 class Confirmation(models.Model):
     key = models.CharField(max_length=50)
@@ -56,6 +58,10 @@ class Category(models.Model):
         unique=True
     )
 
+    class Meta:
+        verbose_name = 'Категория'
+        verbose_name = 'Категории'
+
 
 class Genre(models.Model):
     name = models.CharField(
@@ -67,23 +73,32 @@ class Genre(models.Model):
         unique=True
     )
 
+    class Meta:
+        verbose_name = 'Жанр'
+        verbose_name = 'Жанры'
+
 
 class Title(models.Model):
     name = models.CharField(
         verbose_name='Название произведения',
         max_length=100,
     )
-    year = models.IntegerField(verbose_name='Год создания')
+    year = models.IntegerField(
+        verbose_name='Год создания',
+        validators=[year_validator],
+    )
     category = models.ForeignKey(
         Category,
         null=True,
         on_delete=models.SET_NULL,
-        related_name='category'
+        related_name='titles',
+        verbose_name='Категория'
     )
     genre = models.ManyToManyField(
         Genre,
         db_table='api_genre_title',
-        verbose_name='Жанры произведения'
+        verbose_name='Жанры произведения',
+        related_name='titles'
     )
     description = models.TextField(
         verbose_name='Описание произведения',
@@ -91,6 +106,10 @@ class Title(models.Model):
         null=False,
         default=''
     )
+
+    class Meta:
+        verbose_name = 'Произведение'
+        verbose_name = 'Произведения'
 
 
 class Review(models.Model):
