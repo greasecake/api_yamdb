@@ -1,3 +1,5 @@
+from rest_framework.validators import UniqueTogetherValidator
+
 from .models import (
     Comment,
     Review,
@@ -40,6 +42,16 @@ class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
         read_only=True, slug_field='username'
     )
+
+    def validate(self, data):
+        if self.context['request'].method == 'POST':
+            if Review.objects.filter(
+                    title_id=self.context['view'].kwargs['title_id'],
+                    author=self.context['request'].user).exists():
+                raise serializers.ValidationError(
+                    'Вы уже публиковали отзыв на это произведение.'
+                )
+        return data
 
     class Meta:
         fields = ('id', 'text', 'author', 'score', 'pub_date')
