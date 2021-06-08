@@ -60,7 +60,7 @@ class Category(models.Model):
 
     class Meta:
         verbose_name = 'Категория'
-        verbose_name = 'Категории'
+        verbose_name_plural = 'Категории'
 
 
 class Genre(models.Model):
@@ -75,7 +75,7 @@ class Genre(models.Model):
 
     class Meta:
         verbose_name = 'Жанр'
-        verbose_name = 'Жанры'
+        verbose_name_plural = 'Жанры'
 
 
 class Title(models.Model):
@@ -109,7 +109,7 @@ class Title(models.Model):
 
     class Meta:
         verbose_name = 'Произведение'
-        verbose_name = 'Произведения'
+        verbose_name_plural = 'Произведения'
 
 
 class Review(models.Model):
@@ -159,13 +159,13 @@ class Review(models.Model):
     )
     pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
 
-    def __str__(self):
-        return self.text[:40] + '...'
-
     class Meta:
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
         ordering = ('pub_date',)
+
+    def __str__(self):
+        return self.text[:40] + '...'
 
 
 class Comment(models.Model):
@@ -204,10 +204,10 @@ class Comment(models.Model):
     )
     pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
 
-    def __str__(self):
-        return self.text[:40] + '...'
-
     class Meta:
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
         ordering = ('pub_date',)
+
+    def __str__(self):
+        return self.text[:40] + '...'
