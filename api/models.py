@@ -138,7 +138,7 @@ class Review(models.Model):
         verbose_name='Произведение',
     )
     text = models.CharField(
-        "Текст отзыва",
+        'Текст отзыва',
         max_length=1500,
         help_text='Максимальная длина 1500 символов'
     )
@@ -150,18 +150,18 @@ class Review(models.Model):
         verbose_name='Автор',
     )
     score = models.IntegerField(
-        "Оценка",
+        'Оценка',
         validators=[MinValueValidator(1), MaxValueValidator(10)],
         default=1
     )
-    pub_date = models.DateTimeField("Дата публикации", auto_now_add=True)
+    pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
 
     def __str__(self):
         return self.text[:40] + '...'
 
     class Meta:
-        verbose_name = "Отзыв"
-        verbose_name_plural = "Отзывы"
+        verbose_name = 'Отзыв'
+        verbose_name_plural = 'Отзывы'
 
 
 class Comment(models.Model):
@@ -187,7 +187,7 @@ class Comment(models.Model):
         verbose_name='Отзыв',
     )
     text = models.CharField(
-        "Текст комментария",
+        'Текст комментария',
         max_length=1500,
         help_text='Максимальная длина 1500 символов'
     )
@@ -198,11 +198,11 @@ class Comment(models.Model):
         db_column='author',
         verbose_name='Автор',
     )
-    pub_date = models.DateTimeField("Дата публикации", auto_now_add=True)
+    pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
 
     def __str__(self):
         return self.text[:40] + '...'
 
     class Meta:
-        verbose_name = "Комментарий"
-        verbose_name_plural = "Комментарии"
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
