@@ -1,5 +1,3 @@
-from rest_framework.validators import UniqueTogetherValidator
-
 from .models import (
     Comment,
     Review,
