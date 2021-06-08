@@ -1,5 +1,5 @@
 from datetime import datetime as dt
-from django.core.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError
 
 
 def year_validator(value):
